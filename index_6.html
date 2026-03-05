@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Revolution — לוח בקרה</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0e1a; --bg2:#0f1628; --bg3:#151d35; --border:#1e2d4a;
+  --accent:#00d4ff; --accent2:#00ff9d; --gold:#f0c040;
+  --red:#ff4757; --orange:#ff8c00; --purple:#b44fff;
+  --text:#e8edf5; --muted:#6a7a9a;
+  --mono:'JetBrains Mono',monospace; --sans:'Rubik',sans-serif;
+  --fs-xs:11px; --fs-sm:13px; --fs-md:15px; --fs-lg:18px; --fs-xl:22px; --fs-2xl:28px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none;z-index:0}
+
+.app{max-width:1280px;margin:0 auto;padding:20px;position:relative;z-index:1}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.logo{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.title{font-size:32px;font-weight:900;color:var(--text);letter-spacing:-0.5px}
+.title span{color:var(--accent)}
+.clock-wrap{text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 18px}
+.clock-time{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--accent)}
+.clock-sub{font-size:12px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+.mkt-status{font-size:14px;font-weight:700;margin-top:6px;letter-spacing:0.5px}
+.mkt-open{color:var(--accent2)} .mkt-closed{color:var(--red)} .mkt-pre{color:var(--orange)}
+
+/* ── ALERT BAR ── */
+.alert-bar{display:none;align-items:center;gap:12px;
+  background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.3);
+  border-radius:12px;padding:15px 22px;margin-bottom:18px;font-size:15px;
+  font-weight:500;animation:pulse-bg 3s ease-in-out infinite}
+@keyframes pulse-bg{0%,100%{opacity:1}50%{opacity:.7}}
+.pulse-dot{width:9px;height:9px;border-radius:50%;background:var(--accent2);flex-shrink:0;animation:dot 2s infinite}
+@keyframes dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+/* ── GRID LAYOUTS ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.full{margin-bottom:16px}
+
+/* ── CARD BASE ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.card-accent-top{position:absolute;top:0;left:0;right:0;height:2px}
+.card-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-family:var(--mono);color:var(--muted);margin-bottom:10px;font-weight:600}
+.card-title{font-size:17px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{font-size:12px;letter-spacing:3px;color:var(--muted);font-family:var(--mono);
+  text-transform:uppercase;margin-bottom:14px;margin-top:28px;
+  display:flex;align-items:center;gap:10px;font-weight:600}
+.sec-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── MISSION BOX ── */
+.mission{background:linear-gradient(135deg,#0a1628,#0f2040);
+  border:2px solid var(--accent);border-radius:16px;padding:22px;
+  margin-bottom:16px;box-shadow:0 0 40px rgba(0,212,255,0.07)}
+.mission-label{font-size:12px;letter-spacing:3px;color:var(--accent);font-family:var(--mono);margin-bottom:10px;font-weight:600}
+.mission-text{font-size:24px;font-weight:800;margin-bottom:18px;letter-spacing:-0.5px}
+.mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mission-item{background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);
+  border-radius:12px;padding:16px;font-size:14px;line-height:1.6}
+.mission-num{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px}
+
+/* ── MONEY FLOW ── */
+.flow-chain{display:flex;align-items:center;gap:0;margin:14px 0}
+.flow-node{background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;text-align:center;flex:1;min-width:0}
+.flow-node.active{border-color:var(--accent2);background:rgba(0,255,157,0.05)}
+.flow-node.next{border-color:var(--orange);background:rgba(255,140,0,0.05)}
+.flow-node-name{font-size:13px;font-weight:700;font-family:var(--mono)}
+.flow-node-amt{font-size:11px;color:var(--muted);margin-top:3px}
+.flow-node-status{font-size:10px;margin-top:5px;font-weight:700}
+.flow-arrow{font-size:18px;color:var(--muted);padding:0 6px;flex-shrink:0}
+
+/* ── PRICE CARDS ── */
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:15px;position:relative;overflow:hidden;transition:transform .2s}
+.price-card:hover{transform:translateY(-2px)}
+.price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border);transition:background .3s}
+.price-card.buy::before{background:var(--accent2)}
+.price-card.wait::before{background:var(--orange)}
+.price-card.hold::before{background:var(--red)}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.pc-ticker{font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:-0.3px}
+.pc-badge{font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:var(--mono)}
+.badge-buy{background:rgba(0,255,157,.15);color:var(--accent2);border:1px solid rgba(0,255,157,.3)}
+.badge-wait{background:rgba(255,140,0,.15);color:var(--orange);border:1px solid rgba(255,140,0,.3)}
+.badge-hold{background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3)}
+.pc-name{font-size:13px;color:var(--muted);margin-bottom:10px}
+.pc-price{font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.pc-change{font-family:var(--mono);font-size:13px;margin-top:3px;font-weight:500}
+.pos{color:var(--accent2)} .neg{color:var(--red)}
+.pc-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+.pc-target{font-size:13px;color:var(--muted);margin-bottom:7px}
+.pc-target strong{color:var(--text);font-family:var(--mono)}
+.pc-dist{font-size:12px;color:var(--muted);margin-bottom:9px}
+.pc-bar{background:var(--bg3);border-radius:3px;height:4px;margin-bottom:8px}
+.pc-bar-fill{height:100%;border-radius:3px;transition:width 1s}
+.pc-action{font-size:13px;font-weight:700;padding:9px;border-radius:9px;text-align:center;letter-spacing:0.3px}
+.act-buy{background:rgba(0,255,157,.1);color:var(--accent2);border:1px solid rgba(0,255,157,.25)}
+.act-wait{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.25)}
+.act-hold{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.25)}
+
+/* ── PENSION ── */
+.pension-bar-wrap{margin:10px 0}
+.pension-bar-bg{background:var(--bg3);border-radius:6px;height:10px;overflow:hidden}
+.pension-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--purple),var(--accent));width:20%}
+.pension-nums{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:5px}
+.pension-steps{list-style:none;margin-top:12px}
+.pension-steps li{font-size:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:flex-start;gap:8px;color:var(--muted)}
+.pension-steps li::before{content:'→';color:var(--purple);font-family:var(--mono);flex-shrink:0}
+.pension-steps li strong{color:var(--text)}
+
+/* ── KRAKEN TASKS ── */
+.task-list{list-style:none;margin-top:4px}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+.task-item:last-child{border-bottom:none}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;font-size:14px}
+.task-check.done{background:var(--accent2);border-color:var(--accent2)}
+.task-body{flex:1}
+.task-title{font-weight:700;color:var(--text);margin-bottom:4px;font-size:15px}
+.task-sub{color:var(--muted);font-size:13px;line-height:1.5}
+.task-tag{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:5px;margin-right:4px;display:inline-block;margin-top:5px;font-weight:600}
+.tag-now{background:rgba(0,255,157,.15);color:var(--accent2)}
+.tag-soon{background:rgba(255,140,0,.15);color:var(--orange)}
+.tag-later{background:rgba(255,71,87,.15);color:var(--red)}
+.tag-kraken{background:rgba(0,212,255,.15);color:var(--accent)}
+
+/* ── CRYPTO RECS ── */
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.rec-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px}
+.rec-ticker{font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:5px}
+.rec-thesis{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.rec-conviction{font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;display:inline-block}
+.conv-high{background:rgba(0,255,157,.15);color:var(--accent2)}
+.conv-med{background:rgba(255,140,0,.15);color:var(--orange)}
+.conv-spec{background:rgba(255,71,87,.15);color:var(--red)}
+.rec-warning{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic}
+
+/* ── STATS ROW ── */
+.stat-box{text-align:center;padding:14px}
+.stat-val{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-0.5px}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:0.5px;font-weight:500}
+.stat-change{font-size:13px;font-family:var(--mono);margin-top:4px}
+
+/* ── REFRESH ── */
+.refresh-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);
+  color:var(--accent);padding:7px 16px;border-radius:8px;font-size:11px;
+  font-family:var(--mono);cursor:pointer;letter-spacing:1px;transition:all .2s}
+.refresh-btn:hover{background:rgba(0,212,255,.2)}
+
+.loading-txt{color:var(--muted);font-family:var(--mono);font-size:14px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+@media(max-width:900px){
+  .row4,.rec-grid{grid-template-columns:1fr 1fr}
+  .row3,.mission-grid{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  .flow-chain{flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .row4,.row3,.row2,.rec-grid,.mission-grid{grid-template-columns:1fr}
+  .topbar{flex-direction:column;gap:14px;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="logo">AI Revolution Portfolio Tracker</div>
+    <div class="title">לוח בקרה — <span>ליבנה</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="refresh-btn" onclick="refresh()">↻ רענן</button>
+    <div class="clock-wrap">
+      <div class="clock-time" id="clock">--:--:--</div>
+      <div class="clock-sub">שעון ישראל</div>
+      <div class="mkt-status" id="mkt">בודק...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT -->
+<div class="alert-bar" id="alert">
+  <div class="pulse-dot"></div>
+  <span id="alert-txt">הבורסה פתוחה — בדוק משימות</span>
+</div>
+
+<!-- MISSION -->
+<div class="mission">
+  <div class="mission-label">▶ משימות היום</div>
+  <div class="mission-text" id="mission-txt">טוען נתונים...</div>
+  <div class="mission-grid">
+    <div class="mission-item">
+      <div class="mission-num">01</div>
+      בדוק מחיר BTC — אם מתחת ל-<strong>$65,000</strong> → העבר כסף מהבנק ל-Kraken וקנה
+    </div>
+    <div class="mission-item">
+      <div class="mission-num">02</div>
+      בדוק מחיר PANW — אם מתחת ל-<strong>$160</strong> → קנה $1,500 בברוקר
+    </div>
+    <div class="mission-item">
+      <div class="mission-num">03</div>
+      בדוק העברות — האם יש כסף ב-Kraken שעדיין לא הושקע? אם כן — קנה BTC עכשיו
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="row4">
+  <div class="card stat-box">
+    <div class="card-accent-top" style="background:var(--accent2)"></div>
+    <div class="stat-val" style="color:var(--accent2)">$40K</div>
+    <div class="stat-label">תיק נזיל — יעד</div>
+    <div class="stat-change" style="color:var(--muted)">שלב 1: $12K</div>
+  </div>
+  <div class="card stat-box">
+    <div class="card-accent-top" style="background:var(--purple)"></div>
+    <div class="stat-val" style="color:var(--purple)">₪100K</div>
+    <div class="stat-label">פנסיה — נזילות אומדן</div>
+    <div class="stat-change" style="color:var(--muted)">IRA אגרסיבי</div>
+  </div>
+  <div class="card stat-box">
+    <div class="card-accent-top" style="background:var(--gold)"></div>
+    <div class="stat-val" style="color:var(--gold)" id="btc-price-stat">טוען...</div>
+    <div class="stat-label">BTC מחיר נוכחי</div>
+    <div class="stat-change" id="btc-change-stat" style="color:var(--muted)">—</div>
+  </div>
+  <div class="card stat-box">
+    <div class="card-accent-top" style="background:var(--orange)"></div>
+    <div class="stat-val" style="color:var(--orange)">16:30</div>
+    <div class="stat-label">פתיחת בורסה IL</div>
+    <div class="stat-change" id="time-to-open" style="color:var(--muted)">—</div>
+  </div>
+</div>
+
+<!-- SECTION: MACRO INDICATORS -->
+<div class="sec-hdr">🌍 מד סטרס גלובלי — האווירה הכלכלית עכשיו</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px" id="macro-grid">
+
+  <!-- Fear & Greed -->
+  <div class="card" style="grid-column:span 2">
+    <div class="card-accent-top" style="background:linear-gradient(90deg,var(--red),var(--gold),var(--accent2))"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div>
+        <div class="card-label">CNN Fear & Greed Index</div>
+        <div style="font-size:13px;color:var(--muted)">מד פחד ותאוות בצע — 0 = פחד קיצוני, 100 = תאוות בצע קיצונית</div>
+      </div>
+      <div id="fg-score-badge" style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid var(--border);flex-shrink:0">
+        <div id="fg-score" style="font-family:var(--mono);font-size:22px;font-weight:700">—</div>
+      </div>
+    </div>
+
+    <!-- Gauge bar -->
+    <div style="position:relative;margin-bottom:10px">
+      <div style="height:12px;border-radius:6px;background:linear-gradient(90deg,#ff4757 0%,#ff8c00 25%,#f0c040 50%,#7bed9f 75%,#00ff9d 100%);margin-bottom:6px"></div>
+      <div id="fg-needle" style="position:absolute;top:-4px;width:4px;height:20px;background:white;border-radius:2px;transform:translateX(-50%);left:50%;transition:left 1s ease;box-shadow:0 0 6px rgba(255,255,255,0.5)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono);margin-bottom:14px">
+      <span style="color:var(--red)">פחד קיצוני</span>
+      <span style="color:var(--orange)">פחד</span>
+      <span style="color:var(--gold)">נייטרל</span>
+      <span style="color:var(--accent2)">תאוות בצע</span>
+      <span style="color:#00ff9d">קיצוני</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)">מה זה אומר</div>
+        <div id="fg-meaning" style="font-size:13px;font-weight:600;color:var(--text)">טוען...</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)">פעולה מומלצת</div>
+        <div id="fg-action" style="font-size:13px;font-weight:600;color:var(--text)">טוען...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Copper Price -->
+  <div class="card">
+    <div class="card-accent-top" style="background:#b87333"></div>
+    <div class="card-label">נחושת — LME</div>
+    <div style="font-family:var(--mono);font-size:26px;font-weight:700;color:#e8a060;margin-bottom:4px" id="copper-price">טוען...</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">$ לטון / COPX proxy</div>
+    <div id="copper-signal" style="font-size:13px;font-weight:700;padding:8px;border-radius:8px;text-align:center;background:rgba(184,115,51,0.1);border:1px solid rgba(184,115,51,0.3);color:#e8a060">טוען...</div>
+    <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.6">
+      נחושת מעל $9,000 = ביקוש AI ותשתיות בעלייה — COPX + FCX נהנים
+    </div>
+  </div>
+
+  <!-- BTC Dominance / Macro -->
+  <div class="card">
+    <div class="card-accent-top" style="background:var(--gold)"></div>
+    <div class="card-label">מדד VIX — פחד בוול סטריט</div>
+    <div style="font-family:var(--mono);font-size:26px;font-weight:700;color:var(--gold);margin-bottom:4px" id="vix-price">טוען...</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">תנודתיות ציפויה S&P 500</div>
+    <div id="vix-signal" style="font-size:13px;font-weight:700;padding:8px;border-radius:8px;text-align:center;background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.3);color:var(--gold)">טוען...</div>
+    <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.6">
+      VIX מעל 30 = פחד קיצוני = הזדמנות היסטורית לקנות
+    </div>
+  </div>
+</div>
+
+<!-- MACRO THESIS ROW -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px">
+  <div class="card" style="text-align:center">
+    <div class="card-accent-top" style="background:var(--accent)"></div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;margin-bottom:6px">AI DATA CENTERS</div>
+    <div style="font-size:22px;margin-bottom:4px">⚡</div>
+    <div style="font-size:13px;font-weight:700;color:var(--accent)">ביקוש חשמל</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">+160% עד 2030<br>לפי IEA 2024</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--accent2)">✅ תזה פעילה</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="card-accent-top" style="background:#b87333"></div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;margin-bottom:6px">COPPER DEMAND</div>
+    <div style="font-size:22px;margin-bottom:4px">🔧</div>
+    <div style="font-size:13px;font-weight:700;color:#e8a060">מחסור נחושת</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">גירעון של 10M טון<br>עד 2035 לפי Goldman</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--accent2)">✅ תזה פעילה</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="card-accent-top" style="background:var(--purple)"></div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;margin-bottom:6px">NUCLEAR RENAISSANCE</div>
+    <div style="font-size:22px;margin-bottom:4px">☢️</div>
+    <div style="font-size:13px;font-weight:700;color:var(--purple)">תחייה גרעינית</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">Microsoft, Google, Amazon<br>חתמו על הסכמי גרעין</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--accent2)">✅ תזה פעילה</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="card-accent-top" style="background:var(--accent2)"></div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;margin-bottom:6px">BITCOIN ADOPTION</div>
+    <div style="font-size:22px;margin-bottom:4px">₿</div>
+    <div style="font-size:13px;font-weight:700;color:var(--accent2)">מאגר ערך גלובלי</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">ETF מוסדיים + מדינות<br>מאמצות BTC כרזרבה</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--accent2)">✅ תזה פעילה</div>
+  </div>
+</div>
+
+<!-- SECTION: MONEY FLOW -->
+<div class="sec-hdr">🔄 נתיב כסף לביטקוין — השוואת 2 נתיבים</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+  <!-- PATH A -->
+  <div class="card" style="border-color:rgba(0,255,157,0.35)">
+    <div class="card-accent-top" style="background:var(--accent2)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div style="font-size:10px;color:var(--accent2);font-family:var(--mono);letter-spacing:2px;margin-bottom:3px">הנתיב שלך ✅</div>
+        <div style="font-size:15px;font-weight:700">הפניקס → אוצר החייל → Kraken</div>
+      </div>
+      <div style="background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.3);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--accent2);font-weight:700;text-align:center">נתיב<br>מומלץ</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:3px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="background:rgba(255,140,0,0.08);border:1px solid rgba(255,140,0,0.3);border-radius:8px;padding:8px 8px;text-align:center;flex:1;min-width:60px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange)">🏛️ הפניקס</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">חשבון מסחר</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px;flex-shrink:0">→</div>
+      <div style="background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.25);border-radius:8px;padding:8px 8px;text-align:center;flex:1;min-width:60px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent2)">🏦 אוצר החייל</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">קנה USD כאן</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px;flex-shrink:0">→</div>
+      <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:8px 8px;text-align:center;flex:1;min-width:60px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent)">Kraken</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">SWIFT</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px;flex-shrink:0">→</div>
+      <div style="background:rgba(240,192,64,0.08);border:1px solid rgba(240,192,64,0.25);border-radius:8px;padding:8px 8px;text-align:center;flex:1;min-width:60px">
+        <div style="font-size:11px;font-weight:700;color:var(--gold)">₿ BTC</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">מחיר עולמי</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px;flex-shrink:0">→</div>
+      <div style="background:rgba(180,79,255,0.08);border:1px solid rgba(180,79,255,0.25);border-radius:8px;padding:8px 8px;text-align:center;flex:1;min-width:60px">
+        <div style="font-size:11px;font-weight:700;color:var(--purple)">🔒 Cold Wallet</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Ledger/Trezor</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:2.1;background:var(--bg3);border-radius:8px;padding:12px">
+      <div style="color:var(--text);font-weight:700;margin-bottom:4px;font-size:12px">צעדים בפועל:</div>
+      <div>1. <strong style="color:var(--orange)">הפניקס</strong> → משוך כסף לחשבון אוצר החייל</div>
+      <div>2. <strong style="color:var(--accent2)">אוצר החייל</strong> → קנה USD (מט"ח → קנייה עצמית)</div>
+      <div>3. <strong style="color:var(--accent)">Kraken</strong> → Funding → Deposit → USD → קבל פרטי SWIFT</div>
+      <div>4. <strong style="color:var(--accent2)">אוצר החייל</strong> → מט"ח ובינלאומי → העברה לחו"ל → הוסף Kraken כמוטב</div>
+      <div>5. מטרת ההעברה: <strong style="color:var(--text)">"רכישת נכסים פיננסיים"</strong></div>
+      <div>6. <strong style="color:var(--accent2)">עמלה: 0.125% — מינימום $15, מקסימום $95</strong> + המרת שקל→דולר</div>
+      <div>7. מגיע ל-Kraken תוך <strong style="color:var(--text)">1–3 ימי עסקים</strong></div>
+      <div>8. קנה BTC — <strong style="color:var(--red)">limit order בלבד, לא market order!</strong></div>
+      <div>9. משוך ל-cold wallet מיד לאחר קנייה</div>
+    </div>
+    <div style="margin-top:10px;background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:10px;font-size:11px">
+      <strong style="color:var(--accent2)">✅ יתרון:</strong>
+      <span style="color:var(--muted)"> מחיר BTC עולמי (זול ב-1–3% מBit2c), פחות שלבים, פחות פלטפורמות לנהל.</span>
+    </div>
+  </div>
+
+  <!-- PATH B -->
+  <div class="card" style="border-color:rgba(255,140,0,0.25)">
+    <div class="card-accent-top" style="background:var(--orange)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div style="font-size:10px;color:var(--orange);font-family:var(--mono);letter-spacing:2px;margin-bottom:3px">נתיב חלופי ⚡</div>
+        <div style="font-size:15px;font-weight:700">אוצר החייל → Bit2c → Kraken</div>
+      </div>
+      <div style="background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.3);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--orange);font-weight:700;text-align:center">העברה<br>בשקלים</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="background:rgba(255,140,0,0.07);border:1px solid rgba(255,140,0,0.2);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:55px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange)">🏦 אוצר החייל</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">שקלים</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px">→</div>
+      <div style="background:rgba(255,140,0,0.07);border:1px solid rgba(255,140,0,0.2);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:55px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange)">Bit2c</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">בורסה ישראלית</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px">→</div>
+      <div style="background:rgba(240,192,64,0.07);border:1px solid rgba(240,192,64,0.2);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:55px">
+        <div style="font-size:11px;font-weight:700;color:var(--gold)">₿ BTC</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">קנה בBit2c</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px">→</div>
+      <div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:55px">
+        <div style="font-size:11px;font-weight:700;color:var(--accent)">Kraken</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">אופציונלי</div>
+      </div>
+      <div style="color:var(--muted);font-size:14px">→</div>
+      <div style="background:rgba(180,79,255,0.07);border:1px solid rgba(180,79,255,0.2);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:55px">
+        <div style="font-size:11px;font-weight:700;color:var(--purple)">🔒 Cold</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Cold Wallet</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:2;background:var(--bg3);border-radius:8px;padding:12px">
+      <div style="color:var(--text);font-weight:700;margin-bottom:4px;font-size:12px">איך עושים:</div>
+      <div>1. העבר שקלים מאוצר החייל ל-Bit2c — העברה רגילה בארץ</div>
+      <div>2. פתח חשבון Bit2c מאומת (דרכון / ת.ז)</div>
+      <div>3. קנה BTC ב-Bit2c בשקלים ישירות</div>
+      <div>4. <strong style="color:var(--orange)">עמלה Bit2c: ~0.5% + פרמיה ישראלית 1–3%</strong></div>
+      <div>5. שלח BTC ל-cold wallet ישירות</div>
+    </div>
+    <div style="margin-top:10px;background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-radius:8px;padding:10px;font-size:11px">
+      <strong style="color:var(--red)">⚠️ חסרון:</strong>
+      <span style="color:var(--muted)"> מחיר BTC גבוה ב-1–3% ממחיר עולמי. שלב נוסף. מתאים רק אם צריך מהיר.</span>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="card full" style="margin-bottom:16px">
+  <div class="card-label">השוואה ישירה — לפי $5,000 לדוגמה</div>
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:12px">
+    <div style="background:var(--bg3);padding:10px 14px;font-weight:700;color:var(--muted);font-family:var(--mono);font-size:10px;border-bottom:1px solid var(--border)">קריטריון</div>
+    <div style="background:rgba(0,255,157,0.07);padding:10px 14px;font-weight:700;color:var(--accent2);text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border)">אוצר החייל → Kraken</div>
+    <div style="background:rgba(255,140,0,0.07);padding:10px 14px;font-weight:700;color:var(--orange);text-align:center;border-bottom:1px solid var(--border)">דרך Bit2c</div>
+
+    <div style="padding:10px 14px;color:var(--muted);border-bottom:1px solid var(--border)">עמלת העברה מהבנק</div>
+    <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;color:var(--accent2);font-weight:700;border-bottom:1px solid var(--border)">~$6 (0.125%)</div>
+    <div style="padding:10px 14px;text-align:center;color:var(--accent2);font-weight:700;border-bottom:1px solid var(--border)">זניח — העברה שקלית</div>
+
+    <div style="padding:10px 14px;background:var(--bg3);color:var(--muted);border-bottom:1px solid var(--border)">מחיר BTC שמקבלים</div>
+    <div style="padding:10px 14px;background:var(--bg3);border-right:1px solid var(--border);text-align:center;color:var(--accent2);font-weight:700;border-bottom:1px solid var(--border)">✅ מחיר עולמי $70,000</div>
+    <div style="padding:10px 14px;background:var(--bg3);text-align:center;color:var(--red);font-weight:700;border-bottom:1px solid var(--border)">⚠️ ~$71,400–72,100</div>
+
+    <div style="padding:10px 14px;color:var(--muted);border-bottom:1px solid var(--border)">עלות כוללת על $5K</div>
+    <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;color:var(--accent2);font-weight:700;border-bottom:1px solid var(--border)">~$56 סה"כ</div>
+    <div style="padding:10px 14px;text-align:center;color:var(--red);font-weight:700;border-bottom:1px solid var(--border)">~$125–175 סה"כ</div>
+
+    <div style="padding:10px 14px;background:var(--bg3);color:var(--muted);border-bottom:1px solid var(--border)">זמן עד לקנייה</div>
+    <div style="padding:10px 14px;background:var(--bg3);border-right:1px solid var(--border);text-align:center;color:var(--orange);font-weight:700;border-bottom:1px solid var(--border)">1–3 ימי עסקים</div>
+    <div style="padding:10px 14px;background:var(--bg3);text-align:center;color:var(--accent2);font-weight:700;border-bottom:1px solid var(--border)">✅ יום עסקים אחד</div>
+
+    <div style="padding:10px 14px;color:var(--text);font-weight:700">המלצה</div>
+    <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;background:rgba(0,255,157,0.05);color:var(--accent2);font-weight:700">✅ עדיף תמיד</div>
+    <div style="padding:10px 14px;text-align:center;background:rgba(255,140,0,0.04);color:var(--orange);font-weight:700">⚡ רק אם דחוף</div>
+  </div>
+</div>
+
+<!-- SECTION: PRICES -->
+<div class="sec-hdr">📡 מחירים עדכניים + החלטה</div>
+<div class="row4" id="price-grid">
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+</div>
+<div class="row4" id="price-grid2">
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+  <div class="price-card"><div class="pc-price loading-txt">טוען...</div></div>
+</div>
+
+<!-- SECTION: PORTFOLIO -->
+<div class="sec-hdr">📊 תיקי השקעות — ביצועים עדכניים</div>
+
+<!-- PENSION -->
+<div style="margin-bottom:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div>
+      <div style="font-size:16px;font-weight:800;color:var(--purple)">🏛️ פנסיה IRA — הפניקס</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">סה"כ: ₪133,000 | נזיל: $2,259</div>
+    </div>
+    <div style="text-align:left">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--purple)" id="pension-total">$—</div>
+      <div style="font-size:11px;color:var(--muted)">שווי דולרי נוכחי</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="pension-grid">
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+  </div>
+</div>
+
+<!-- TRAINING FUND -->
+<div style="margin-bottom:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div>
+      <div style="font-size:16px;font-weight:800;color:var(--accent)">📈 קרן השתלמות — הפניקס</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">סה"כ: ₪25,600 | נזיל: $4,263</div>
+    </div>
+    <div style="text-align:left">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent)" id="training-total">$—</div>
+      <div style="font-size:11px;color:var(--muted)">שווי דולרי נוכחי</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="training-grid">
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+    <div class="price-card"><div class="loading-txt" style="font-size:13px">טוען...</div></div>
+  </div>
+</div>
+
+<!-- SECTION: PENSION PLAN -->
+<div class="sec-hdr">🏛️ פנסיה וקרן השתלמות — הפניקס</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+
+  <!-- PENSION STATUS -->
+  <div class="card">
+    <div class="card-accent-top" style="background:var(--purple)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div class="card-label">קרן פנסיה IRA — הפניקס</div>
+        <div style="font-size:17px;font-weight:800">₪133,000 סה"כ</div>
+      </div>
+      <div style="background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.3);border-radius:8px;padding:8px 12px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:var(--accent2)">IRA קיים ✅</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">לא צריך לפתוח</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--bg3);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--purple)">₪133,000</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">שווי כולל</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent2)">$2,259</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">נזיל כרגע</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg3);border-radius:10px;padding:13px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">מה מחזיק עכשיו:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="background:rgba(247,147,26,0.15);color:#f7931a;border:1px solid rgba(247,147,26,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">375 IBIT</span>
+        <span style="background:rgba(0,164,239,0.15);color:#00a4ef;border:1px solid rgba(0,164,239,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">3 MSFT</span>
+        <span style="background:rgba(125,60,255,0.15);color:#7d3cff;border:1px solid rgba(125,60,255,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">47 PLTR</span>
+        <span style="background:rgba(0,212,255,0.15);color:var(--accent);border:1px solid rgba(0,212,255,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">19.93 QQQ</span>
+        <span style="background:rgba(0,255,157,0.12);color:var(--accent2);border:1px solid rgba(0,255,157,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">143 SOFI</span>
+        <span style="background:rgba(227,25,55,0.15);color:#e31937;border:1px solid rgba(227,25,55,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">5 TSLA</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(180,79,255,0.07);border:1px solid rgba(180,79,255,0.2);border-radius:8px;padding:11px;font-size:12px;color:var(--muted);line-height:1.8">
+      🔒 <strong style="color:var(--text)">כלל ברזל:</strong> לא נוגע — לא מושך — צומח 30 שנה<br>
+      ⚡ <strong style="color:var(--text)">פעולה אחת:</strong> בדוק באתר הפניקס אם אפשר לשנות הקצאה פנימית
+    </div>
+  </div>
+
+  <!-- TRAINING FUND STATUS -->
+  <div class="card">
+    <div class="card-accent-top" style="background:var(--accent)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div class="card-label">קרן השתלמות — הפניקס</div>
+        <div style="font-size:17px;font-weight:800">₪25,600 סה"כ</div>
+      </div>
+      <div style="background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.3);border-radius:8px;padding:8px 12px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:var(--gold)">⚡ בדוק נזילות</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">תאריך 6 שנים</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--bg3);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent)">₪25,600</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">שווי כולל</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent2)">$4,263</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">נזיל כרגע</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg3);border-radius:10px;padding:13px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">מה מחזיק עכשיו:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="background:rgba(255,153,0,0.15);color:#ff9900;border:1px solid rgba(255,153,0,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">5 AMZN</span>
+        <span style="background:rgba(0,180,216,0.15);color:#00b4d8;border:1px solid rgba(0,180,216,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">30 PHO</span>
+        <span style="background:rgba(0,48,135,0.3);color:#4a90d9;border:1px solid rgba(74,144,217,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">10.5 PYPL</span>
+        <span style="background:rgba(180,79,255,0.15);color:var(--purple);border:1px solid rgba(180,79,255,0.3);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700">10 QBTX</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:11px;font-size:12px;color:var(--muted);line-height:1.8">
+      🎁 <strong style="color:var(--text)">יתרון גדול:</strong> פטורה ממס רווחי הון — לא למשוך!<br>
+      ⚡ <strong style="color:var(--text)">פעולה אחת:</strong> בדוק תאריך נזילות באתר הפניקס
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: KRAKEN TASKS -->
+<!-- SECTION: ENTRY PLAN -->
+<div class="sec-hdr">🎯 לוח פעולות — מתי לקנות מה</div>
+<div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.7">
+  <strong style="color:var(--text)">איך לקרוא את הטבלה:</strong> 
+  כשעמודת "סטטוס" מראה <span style="color:var(--accent2);font-weight:700">🟢 קנה עכשיו</span> — המחיר הנוכחי נמוך מיעד הכניסה שקבענו. 
+  <span style="color:var(--orange);font-weight:700">🟡 קרוב</span> — עקוב, עוד לא הגיע. 
+  <span style="color:var(--red);font-weight:700">🔴 המתן</span> — המחיר גבוה מדי, אל תיכנס.
+  הטבלה מתרעננת אוטומטית.
+</div>
+
+<!-- GOAL BOX -->
+<div style="background:linear-gradient(135deg,#0a1628,#0d1f3a);border:2px solid var(--gold);border-radius:16px;padding:22px;margin-bottom:16px">
+  <div style="font-size:10px;letter-spacing:4px;color:var(--gold);font-family:var(--mono);margin-bottom:8px">▶ המטרה הכוללת</div>
+  <div style="font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px">הכנסה פסיבית שוטפת — חופש כלכלי מלא</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:16px">BTC כמנוע צמיחה · דיבידנדים כגידור · RWA tokenization כהכנסה עתידית</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+    <div style="background:rgba(240,192,64,0.08);border:1px solid rgba(240,192,64,0.25);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold)">₪20K–35K</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">יעד הכנסה חודשית</div>
+      <div style="font-size:10px;color:var(--gold);margin-top:3px;font-family:var(--mono)">פסיבית לחלוטין</div>
+    </div>
+    <div style="background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.2);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent2)" id="goal-total-now">מחשב...</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">שווי כולל עכשיו</div>
+      <div style="font-size:10px;color:var(--accent2);margin-top:3px;font-family:var(--mono)" id="goal-pct-done">טוען...</div>
+    </div>
+    <div style="background:rgba(247,147,26,0.08);border:1px solid rgba(247,147,26,0.25);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:#f7931a">BTC</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">מנוע צמיחה ראשי</div>
+      <div style="font-size:10px;color:#f7931a;margin-top:3px;font-family:var(--mono)">35% מהתיק הנזיל</div>
+    </div>
+    <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent)">דיבידנדים</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">גידור ותזרים</div>
+      <div style="font-size:10px;color:var(--accent);margin-top:3px;font-family:var(--mono)">PHO · COPX · CCJ</div>
+    </div>
+    <div style="background:rgba(180,79,255,0.06);border:1px solid rgba(180,79,255,0.2);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--purple)">RWA</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">שכירות טוקניזציה</div>
+      <div style="font-size:10px;color:var(--purple);margin-top:3px;font-family:var(--mono)">נדל"ן ישראלי</div>
+    </div>
+  </div>
+
+  <!-- Progress bar to $1M -->
+  <div style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)">
+      <span>$0</span><span id="goal-progress-label">התקדמות לעבר $1M</span><span>$1,000,000</span>
+    </div>
+    <div style="background:var(--bg3);border-radius:6px;height:8px;overflow:hidden">
+      <div id="goal-progress-bar" style="height:100%;border-radius:6px;background:linear-gradient(90deg,var(--purple),var(--accent),var(--accent2));width:0%;transition:width 1.5s ease"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ENTRY PLAN TABLE -->
+<div class="card full">
+  <div class="card-label">תכנית כניסה — תיק נזיל $40K — 3 שלבים</div>
+  <div style="overflow-x:auto">
+    <table id="entry-table" style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border)">
+          <th style="padding:11px 12px;text-align:right;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">נכס</th>
+          <th style="padding:11px 10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">מחיר עכשיו</th>
+          <th style="padding:11px 10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">יעד כניסה</th>
+          <th style="padding:11px 10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">מרחק מיעד</th>
+          <th style="padding:11px 10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">פעולה</th>
+          <th style="padding:11px 10px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">שלב / סכום</th>
+          <th style="padding:11px 10px;text-align:right;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600">תזה + מה לעשות</th>
+        </tr>
+      </thead>
+      <tbody id="entry-tbody">
+        <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--muted)" class="loading-txt">טוען מחירים...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Allocation bar -->
+  <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:1px;margin-bottom:10px">הקצאה מתוכננת — $40,000</div>
+    <div style="display:flex;height:28px;border-radius:8px;overflow:hidden;gap:2px">
+      <div style="flex:3.5;background:linear-gradient(135deg,#f7931a,#ffb347);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000">BTC 35%</div>
+      <div style="flex:1.5;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000">PANW 15%</div>
+      <div style="flex:1.5;background:linear-gradient(135deg,#b87333,#d4956a);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000">FCX 15%</div>
+      <div style="flex:1;background:linear-gradient(135deg,#b87333,#8b5a2b);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">COPX 10%</div>
+      <div style="flex:1;background:linear-gradient(135deg,#e74c3c,#c0392b);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">VRT 10%</div>
+      <div style="flex:1;background:linear-gradient(135deg,#8e44ad,#6c3483);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">CCJ 8%</div>
+      <div style="flex:0.7;background:linear-gradient(135deg,#27ae60,#1e8449);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">SMR 7%</div>
+    </div>
+  </div>
+</div>
+
+<!-- TWO LAYER STRATEGY -->
+<div class="sec-hdr">🗺️ שתי שכבות — התכנית הריאלית</div>
+
+<!-- REALITY CHECK BANNER -->
+<div style="background:linear-gradient(135deg,rgba(255,71,87,0.08),rgba(255,140,0,0.08));border:1px solid rgba(255,140,0,0.3);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;gap:16px;align-items:flex-start">
+  <div style="font-size:28px;flex-shrink:0">📊</div>
+  <div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px">המצב האמיתי — תיק נוכחי ~$55K, יעד לחיות מתשואות: $400K–600K</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7">הפער הוא פי 8–10. לא ניתן לסגור אותו בשנה אחת מתשואות בלבד — אבל <strong style="color:var(--orange)">הקואצ'ינג שלך הוא המנוע האמיתי לשנים הקרובות.</strong> ההשקעות צומחות בצד בשקט עד שהן מחליפות את הצורך לעבוד.</div>
+  </div>
+</div>
+
+<!-- TWO LAYERS SIDE BY SIDE -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+  <!-- LAYER A: ACTIVE INCOME -->
+  <div style="background:linear-gradient(135deg,#0a1a2a,#0d2035);border:2px solid rgba(0,255,157,0.3);border-radius:16px;padding:22px">
+    <div style="font-size:10px;color:var(--accent2);font-family:var(--mono);letter-spacing:3px;margin-bottom:10px">שכבה א — הכנסה שוטפת</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px">קואצ'ינג</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">ממן את החיים · Southeast Asia · שנים 1–3</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent2)">₪50K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">יעד מינימום/חודש</div>
+      </div>
+      <div style="background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent2)">₪150K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">יעד אופטימלי/חודש</div>
+      </div>
+      <div style="background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold)">₪8K–12K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">הוצאות SEA/חודש</div>
+      </div>
+      <div style="background:rgba(0,255,157,0.07);border:1px solid rgba(0,255,157,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--purple)" id="monthly-invest">₪30K+</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">חיסכון להשקעה/חודש</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);line-height:1.9;background:rgba(0,0,0,0.2);border-radius:8px;padding:12px">
+      <strong style="color:var(--text)">כל שקל עודף → ישר להשקעה:</strong><br>
+      40% → BTC דרך Kraken<br>
+      35% → תיק נזיל (מניות/ETF)<br>
+      25% → חיסכון נזיל לחירום
+    </div>
+  </div>
+
+  <!-- LAYER B: GROWING WEALTH -->
+  <div style="background:linear-gradient(135deg,#0a1628,#0f1f40);border:2px solid rgba(247,147,26,0.3);border-radius:16px;padding:22px">
+    <div style="font-size:10px;color:#f7931a;font-family:var(--mono);letter-spacing:3px;margin-bottom:10px">שכבה ב — עושר צומח</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px">BTC + מניות + פנסיה</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">לא נוגע · לא מושך · צומח בשקט · שנים 1–10+</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:rgba(247,147,26,0.07);border:1px solid rgba(247,147,26,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:#f7931a" id="portfolio-now-val">$55K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">שווי נוכחי</div>
+      </div>
+      <div style="background:rgba(247,147,26,0.07);border:1px solid rgba(247,147,26,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold)">$400K–600K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">יעד לחיות מתשואות</div>
+      </div>
+      <div style="background:rgba(247,147,26,0.07);border:1px solid rgba(247,147,26,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent2)">5–7 שנים</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">זמן מוערך להגיע</div>
+      </div>
+      <div style="background:rgba(247,147,26,0.07);border:1px solid rgba(247,147,26,0.2);border-radius:8px;padding:11px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--purple)">₪15K–20K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">הכנסה פסיבית ביעד</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);line-height:1.9;background:rgba(0,0,0,0.2);border-radius:8px;padding:12px">
+      <strong style="color:var(--text)">כללי ברזל — שכבה ב:</strong><br>
+      🔒 BTC — לא נוגע עד $150K+<br>
+      🔒 פנסיה + השתלמות — לא נוגע<br>
+      🔒 מניות נזילות — רק rebalance<br>
+      ⚡ DCA חודשי מהקואצ'ינג
+    </div>
+  </div>
+</div>
+
+<!-- TIMELINE TO FREEDOM -->
+<div class="card full" style="margin-bottom:16px">
+  <div class="card-label">ציר זמן — מתי כל שכבה מניבה</div>
+  <div style="position:relative;margin:10px 0 20px">
+    <!-- Timeline bar -->
+    <div style="height:6px;background:linear-gradient(90deg,var(--accent2),var(--orange),var(--gold),var(--purple));border-radius:3px;margin:30px 0 10px"></div>
+    <!-- Year markers -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:0">
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent2)">עכשיו</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">קואצ'ינג מממן<br>BTC נצבר<br>תיק נבנה</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--orange)">שנה 2</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">תיק $120K–150K<br>BTC 0.5+<br>FCX+COPX נכנסים</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold)">שנה 4</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">תיק $250K–300K<br>דיבידנדים ₪3K–5K<br>RWA — שלב ראשון</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--purple)">שנה 6</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">תיק $400K–500K<br>תשואות ₪8K–12K<br>קואצ'ינג — בחירה</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold)">שנה 8–10</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">תיק $600K–1M+<br>חופש מלא<br>₪20K–35K/חודש</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transition point -->
+  <div style="background:rgba(240,192,64,0.07);border:1px solid rgba(240,192,64,0.25);border-radius:10px;padding:14px;display:flex;gap:14px;align-items:center">
+    <div style="font-size:28px;flex-shrink:0">🎯</div>
+    <div>
+      <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:4px">נקודת המעבר — "The Crossover Point"</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">כשהתשואות החודשיות מהתיק עוברות את הוצאות המחיה שלך — <strong style="color:var(--text)">אתה חופשי.</strong> לפי הנתונים הנוכחיים, עם DCA חודשי של ₪15K–30K מהקואצ'ינג, זה יקרה בין שנה 5 לשנה 7. הקואצ'ינג ממשיך להתקיים רק אם אתה רוצה.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-hdr">⚡ משימות Kraken — התקדמות</div>
+<div class="row2">
+  <div class="card">
+    <div class="card-accent-top" style="background:var(--accent)"></div>
+    <div class="card-label">משימות נוכחיות — לחץ לסמן כבוצע</div>
+    <ul class="task-list" id="task-list">
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">הגדר הפקדה בנקאית ב-Kraken</div>
+          <div class="task-sub">Funding → Deposit → EUR/USD → קבל פרטי SWIFT</div>
+          <span class="task-tag tag-now">עכשיו</span><span class="task-tag tag-kraken">Kraken</span>
+        </div>
+      </li>
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">העבר כסף ראשון מהבנק</div>
+          <div class="task-sub">$3,500–$5,000 כסכום ראשון לקנות BTC ב-$65K–$70K</div>
+          <span class="task-tag tag-now">עכשיו</span><span class="task-tag tag-kraken">בנק → Kraken</span>
+        </div>
+      </li>
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">קנה BTC הראשון</div>
+          <div class="task-sub">רק לאחר שהכסף הגיע. זוג BTC/USD. לא market order — limit order!</div>
+          <span class="task-tag tag-now">אחרי הפקדה</span><span class="task-tag tag-kraken">Kraken</span>
+        </div>
+      </li>
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">פתח cold wallet</div>
+          <div class="task-sub">Ledger Nano X / Trezor Model T. אל תשאיר BTC ב-Kraken לאורך זמן</div>
+          <span class="task-tag tag-soon">חשוב</span>
+        </div>
+      </li>
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">משוך BTC ל-cold wallet</div>
+          <div class="task-sub">לאחר כל קנייה — Withdraw → הכתובת של ה-cold wallet שלך</div>
+          <span class="task-tag tag-soon">אחרי קנייה</span><span class="task-tag tag-kraken">Kraken → Cold Wallet</span>
+        </div>
+      </li>
+      <li class="task-item">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-body">
+          <div class="task-title">בדוק אפשרות לקנות PANW ב-Kraken</div>
+          <div class="task-sub">Kraken תומך במניות מסוימות — אחרת צריך ברוקר נפרד (IBKR מומלץ)</div>
+          <span class="task-tag tag-later">שלב 2</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-accent-top" style="background:var(--accent)"></div>
+    <div class="card-label">מעקב העברות — עדכן ידנית</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold)" id="inv-total">$0</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">הועבר ל-Kraken</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent2)" id="btc-held">0 BTC</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">BTC שנרכש</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--purple)" id="cold-wallet">0 BTC</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">ב-Cold Wallet</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--muted)" id="remaining">$40K</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">נשאר להשקיע</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.8;background:var(--bg3);border-radius:8px;padding:12px">
+      <strong style="color:var(--text)">📋 לעדכן שבועית:</strong><br>
+      □ כמה הועבר השבוע מהבנק?<br>
+      □ כמה BTC נרכש ובאיזה מחיר?<br>
+      □ כמה עבר ל-cold wallet?<br>
+      □ כמה מזומן נשאר ב-Kraken ולא הושקע?
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: CRYPTO RECS -->
+<div class="sec-hdr">🌐 Kraken — נכסים נוספים לשקול בהמשך</div>
+<div class="card full">
+  <div class="card-label">בהתאמה לשינויים גלובליים — לא עכשיו, לאחר BTC מבוסס</div>
+  <div style="background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--red)">
+    ⚠️ אלו נכסים ספקולטיביים בלבד — רק לאחר שה-BTC הבסיסי שלך מבוסס. לא יותר מ-5-10% מהתיק.
+  </div>
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#f7931a">₿ Bitcoin (BTC)</div>
+      <div class="rec-thesis">הנכס הראשי — עיקר ה-thesis שלך. אל תתפזר לפני שה-BTC מבוסס.</div>
+      <span class="rec-conviction conv-high">עדיפות עליונה</span>
+    </div>
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#627eea">Ethereum (ETH)</div>
+      <div class="rec-thesis">תשתית Web3 + AI. DeFi ו-smart contracts. אם BTC מבוסס — ETH הוא ה-next.</div>
+      <span class="rec-conviction conv-high">גבוה</span>
+      <div class="rec-warning">רק לאחר BTC מבוסס</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#00d4c8">Chainlink (LINK)</div>
+      <div class="rec-thesis">Real World Assets — מחבר בין blockchain לנתוני עולם אמיתי. קשור ל-RWA tokenization שדיברנו עליו.</div>
+      <span class="rec-conviction conv-med">בינוני</span>
+      <div class="rec-warning">מתאים ל-thesis RWA שלך</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#e84142">Avalanche (AVAX)</div>
+      <div class="rec-thesis">תשתית לטוקניזציה של נכסים פיננסיים. בנקים גדולים בונים עליו.</div>
+      <span class="rec-conviction conv-med">בינוני</span>
+      <div class="rec-warning">ספקולטיבי יותר</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#2775ca">USDC / USDT</div>
+      <div class="rec-thesis">Stablecoin — להחזיק ב-Kraken כ"מזומן" מוכן לקנייה מהירה בירידות.</div>
+      <span class="rec-conviction conv-high">שימושי תמיד</span>
+    </div>
+    <div class="rec-card">
+      <div class="rec-ticker" style="color:#ff6b35">Copper Tokens (RWA)</div>
+      <div class="rec-thesis">טוקניזציה של נחושת פיזית — ישירות מחובר ל-thesis שלך. עדיין מוקדם אבל לעקוב.</div>
+      <span class="rec-conviction conv-spec">ספקולטיבי</span>
+      <div class="rec-warning">שוק בהתהוות — לעקוב</div>
+    </div>
+  </div>
+</div>
+
+<div style="height:40px"></div>
+</div>
+
+<script>
+const ASSETS=[
+  {t:'BTC-USD', l:'BTC',  n:'ביטקוין',      buy:70000, wait:75000, stage:1, crypto:true},
+  {t:'PANW',   l:'PANW', n:'Palo Alto',     buy:160,   wait:175,   stage:1, crypto:false},
+  {t:'SMR',    l:'SMR',  n:'NuScale',       buy:13,    wait:16,    stage:1, crypto:false},
+  {t:'FCX',    l:'FCX',  n:'Freeport',      buy:65,    wait:72,    stage:2, crypto:false},
+  {t:'COPX',   l:'COPX', n:'Copper ETF',    buy:85,    wait:92,    stage:2, crypto:false},
+  {t:'VRT',    l:'VRT',  n:'Vertiv',        buy:210,   wait:225,   stage:3, crypto:false},
+  {t:'CCJ',    l:'CCJ',  n:'Cameco',        buy:105,   wait:115,   stage:3, crypto:false},
+  {t:'GRID',   l:'GRID', n:'Grid ETF',      buy:150,   wait:162,   stage:3, crypto:false},
+];
+let prices={};
+
+// Clock & market
+function tick(){
+  const now=new Date();
+  const il=new Date(now.toLocaleString('en-US',{timeZone:'Asia/Jerusalem'}));
+  document.getElementById('clock').textContent=
+    [il.getHours(),il.getMinutes(),il.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+
+  const ny=new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const m=ny.getHours()*60+ny.getMinutes(), d=ny.getDay();
+  const mktEl=document.getElementById('mkt'), alertEl=document.getElementById('alert');
+  if(d===0||d===6){mktEl.textContent='⬛ סגור — סוף שבוע';mktEl.className='mkt-status mkt-closed';alertEl.style.display='none';}
+  else if(m>=570&&m<930){mktEl.textContent='🟢 בורסה פתוחה';mktEl.className='mkt-status mkt-open';alertEl.style.display='flex';document.getElementById('alert-txt').textContent='🔔 הבורסה פתוחה — בדוק מחירים ומשימות';}
+  else if(m>=240&&m<570){mktEl.textContent='🟡 Pre-Market';mktEl.className='mkt-status mkt-pre';alertEl.style.display='flex';document.getElementById('alert-txt').textContent='⚡ Pre-Market — מחירים אינדיקטיביים';}
+  else{mktEl.textContent='⬛ בורסה סגורה';mktEl.className='mkt-status mkt-closed';alertEl.style.display='none';}
+
+  // time to open
+  const ilH=il.getHours(), ilM=il.getMinutes();
+  const ilMins=ilH*60+ilM;
+  const openMins=16*60+30;
+  if(ilMins<openMins){const diff=openMins-ilMins;document.getElementById('time-to-open').textContent=`פותחת בעוד ${Math.floor(diff/60)}ש ${diff%60}ד`;}
+  else{document.getElementById('time-to-open').textContent='בורסה פתוחה עכשיו!';}
+}
+
+// Fetch
+// ── Manual price entry fallback ──────────────────────────
+// מחירי ברירת מחדל — מעודכנים ידנית או דרך כפתור עדכון
+const MANUAL_PRICES = {
+  'BTC-USD': 70000,
+  'PANW':    159,
+  'SMR':     13,
+  'FCX':     68,
+  'COPX':    87,
+  'VRT':     250,
+  'CCJ':     125,
+  'GRID':    170,
+};
+
+async function fetchPrice(ticker){
+  // BTC — Coinbase API, עובד ללא CORS
+  if(ticker==='BTC-USD'){
+    try{
+      const r=await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot',{signal:AbortSignal.timeout(5000)});
+      const d=await r.json();
+      const price=parseFloat(d?.data?.amount);
+      if(price>0){
+        const prev=MANUAL_PRICES['BTC-USD']||price;
+        const change=((price-prev)/prev*100).toFixed(2);
+        MANUAL_PRICES['BTC-USD']=price;
+        return{price, prev, change};
+      }
+    }catch{}
+  }
+
+  // מניות — Stooq (עובד ללא CORS לרוב)
+  try{
+    const sym=ticker.toLowerCase()+'.us';
+    const r=await fetch(`https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=json`,{signal:AbortSignal.timeout(6000)});
+    const d=await r.json();
+    const q=d?.symbols?.[0];
+    if(q?.close && parseFloat(q.close)>0){
+      const price=parseFloat(q.close);
+      const prev=parseFloat(q.open)||price;
+      const change=prev>0?((price-prev)/prev*100).toFixed(2):'0.00';
+      return{price, prev, change};
+    }
+  }catch{}
+
+  // fallback — החזר מחיר ידני אחרון + אינדיקציה
+  const manual = MANUAL_PRICES[ticker];
+  if(manual) return{price:manual, prev:manual, change:'—', isManual:true};
+  
+  return null;
+}
+
+function fmtPrice(p,crypto){return crypto?'$'+Math.round(p).toLocaleString('en-US'):'$'+p.toFixed(2);}
+
+function makeCard(a){
+  const p=prices[a.t];
+  const price=p?.price, chg=p?.change;
+  let status='hold', badge='badge-hold', actClass='act-hold', actTxt='🚫 יקר מדי';
+  if(!price){return`<div class="price-card" style="display:flex;align-items:center;justify-content:center;min-height:160px"><div style="text-align:center"><div class="loading-txt" style="font-size:14px">${a.l}</div><div style="font-size:11px;color:var(--muted);margin-top:6px">מחפש מחיר...</div></div></div>`;}
+  if(price<=a.buy){status='buy';badge='badge-buy';actClass='act-buy';actTxt=a.stage===1?'✅ קנה עכשיו!':'⚡ שקול לקנות';}
+  else if(price<=a.wait){status='wait';badge='badge-wait';actClass='act-wait';actTxt='⏳ קרוב — עקוב';}
+  const pct=((price-a.buy)/a.buy*100).toFixed(1);
+  const distTxt=parseFloat(pct)<=0?`✅ ${Math.abs(pct)}% מתחת ליעד!`:`${pct}% מעל יעד`;
+  const chgNum=parseFloat(chg||0);
+  const fill=Math.min(100,Math.max(0,(a.wait-price)/(a.wait-a.buy)*100));
+  const stageColor=a.stage===1?'var(--accent2)':a.stage===2?'var(--orange)':'var(--red)';
+  return`<div class="price-card ${status}">
+    <div class="pc-top">
+      <div><div class="pc-ticker">${a.l}</div><div class="pc-name">${a.n}</div></div>
+      <span class="pc-badge ${badge}">שלב ${a.stage}</span>
+    </div>
+    <div class="pc-price">${fmtPrice(price,a.crypto)}</div>
+    <div class="pc-change ${chgNum>=0?'pos':'neg'}">${chgNum>=0?'+':''}${chg}% היום</div>
+    <hr class="pc-divider">
+    <div class="pc-target">יעד: <strong>${a.crypto?'$'+a.buy.toLocaleString():'$'+a.buy}</strong></div>
+    <div class="pc-dist">${distTxt}</div>
+    <div class="pc-bar"><div class="pc-bar-fill" style="width:${fill}%;background:${stageColor}"></div></div>
+    <div class="pc-action ${actClass}">${actTxt}</div>
+  </div>`;
+}
+
+function renderPrices(){
+  const g1=document.getElementById('price-grid');
+  const g2=document.getElementById('price-grid2');
+  g1.innerHTML=ASSETS.slice(0,4).map(a=>makeCard(a)).join('');
+  g2.innerHTML=ASSETS.slice(4).map(a=>makeCard(a)).join('');
+
+  // BTC stat
+  const b=prices['BTC-USD'];
+  if(b){
+    document.getElementById('btc-price-stat').textContent='$'+Math.round(b.price).toLocaleString();
+    const cn=parseFloat(b.change);
+    document.getElementById('btc-change-stat').textContent=`${cn>=0?'+':''}${b.change}% היום`;
+    document.getElementById('btc-change-stat').style.color=cn>=0?'var(--accent2)':'var(--red)';
+  }
+
+  // Mission
+  const buyNow=ASSETS.filter(a=>{const p=prices[a.t];return p?.price&&p.price<=a.buy;});
+  const mEl=document.getElementById('mission-txt');
+  if(buyNow.length===0){mEl.textContent='אין כניסות היום — שמור מזומן וחכה';mEl.style.color='var(--muted)';}
+  else{mEl.innerHTML=`🟢 <strong style="color:var(--accent2)">${buyNow.map(a=>a.l).join(', ')}</strong> הגיעו לאזור קנייה!`;mEl.style.color='var(--text)';}
+}
+
+async function refresh(){
+  const btn=document.getElementById('refresh-btn');
+  if(btn){btn.textContent='↻ טוען...';btn.style.opacity='0.6';}
+
+  const res=await Promise.all(ASSETS.map(a=>fetchPrice(a.t)));
+  let gotData=false;
+  ASSETS.forEach((a,i)=>{
+    if(res[i]){prices[a.t]=res[i]; gotData=true;}
+  });
+  
+  document.getElementById('last-update').textContent=
+    gotData ? new Date().toLocaleTimeString('he-IL') : 'שגיאה — נסה שוב';
+  
+  if(btn){btn.textContent='↻ רענן';btn.style.opacity='1';}
+  renderPrices();
+  renderEntryTable();
+}
+
+// Task toggle
+function toggleTask(el){
+  el.classList.toggle('done');
+  el.innerHTML=el.classList.contains('done')?'✓':'';
+  el.style.color=el.classList.contains('done')?'#0a0e1a':'';
+}
+
+setInterval(tick,1000); tick();
+refresh();
+fetchMacro();
+fetchPortfolio();
+setInterval(refresh,60000);
+setInterval(fetchMacro,300000);
+setInterval(fetchPortfolio,120000);
+
+// ── Portfolio Data ─────────────────────────────────────────────
+const PENSION = [
+  {t:'IBIT',  n:'iShares Bitcoin ETF', qty:375,   cost:53.16,  color:'#f7931a'},
+  {t:'MSFT',  n:'Microsoft',           qty:3,     cost:517,    color:'#00a4ef'},
+  {t:'PLTR',  n:'Palantir',            qty:47,    cost:156.67, color:'#7d3cff'},
+  {t:'QQQ',   n:'Nasdaq 100 ETF',      qty:19.93, cost:529,    color:'#00d4ff'},
+  {t:'SOFI',  n:'SoFi Technologies',   qty:143,   cost:13.41,  color:'#00ff9d'},
+  {t:'TSLA',  n:'Tesla',               qty:5,     cost:345.78, color:'#e31937'},
+];
+
+const TRAINING = [
+  {t:'AMZN',  n:'Amazon',              qty:5,     cost:227,    color:'#ff9900'},
+  {t:'PHO',   n:'Water ETF',           qty:30,    cost:68.95,  color:'#00b4d8'},
+  {t:'PYPL',  n:'PayPal',              qty:10.5,  cost:68.24,  color:'#003087'},
+  {t:'QBTX',  n:'Quantum Computing',   qty:10,    cost:91.78,  color:'#b44fff'},
+];
+
+const portPrices = {};
+
+function makePortCard(h, p){
+  const price = p?.price;
+  if(!price) return `<div class="price-card" style="min-height:130px">
+    <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${h.color}">${h.t}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${h.n}</div>
+    <div class="loading-txt" style="font-size:12px">טוען מחיר...</div>
+  </div>`;
+
+  const curVal  = price * h.qty;
+  const costVal = h.cost * h.qty;
+  const pnl     = curVal - costVal;
+  const pnlPct  = ((pnl / costVal) * 100).toFixed(1);
+  const isPos   = pnl >= 0;
+  const chgNum  = parseFloat(p.change || 0);
+
+  return `<div class="price-card" style="border-color:${isPos?'rgba(0,255,157,0.2)':'rgba(255,71,87,0.2)'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div>
+        <div style="font-family:var(--mono);font-size:17px;font-weight:700;color:${h.color}">${h.t}</div>
+        <div style="font-size:11px;color:var(--muted)">${h.n}</div>
+      </div>
+      <div style="text-align:left">
+        <div style="font-family:var(--mono);font-size:15px;font-weight:700">$${price.toFixed(2)}</div>
+        <div style="font-size:11px;font-family:var(--mono);color:${chgNum>=0?'var(--accent2)':'var(--red)'}">${chgNum>=0?'+':''}${p.change}%</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:8px 0;padding-top:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
+        <span>${h.qty} יח׳ × $${h.cost}</span>
+        <span>עלות: $${costVal.toFixed(0)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:var(--mono);font-size:15px;font-weight:700">$${curVal.toFixed(0)}</div>
+        <div style="font-size:13px;font-weight:700;padding:3px 8px;border-radius:6px;
+          background:${isPos?'rgba(0,255,157,0.12)':'rgba(255,71,87,0.12)'};
+          color:${isPos?'var(--accent2)':'var(--red)'}">
+          ${isPos?'+':''}${pnlPct}%
+        </div>
+      </div>
+      <div style="font-size:11px;color:${isPos?'var(--accent2)':'var(--red)'};margin-top:2px;font-family:var(--mono)">
+        ${isPos?'▲ +':'▼ '}$${Math.abs(pnl).toFixed(0)} P&L
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPortfolio(){
+  const pg = document.getElementById('pension-grid');
+  const tg = document.getElementById('training-grid');
+  if(pg) pg.innerHTML = PENSION.map(h => makePortCard(h, portPrices[h.t])).join('');
+  if(tg) tg.innerHTML = TRAINING.map(h => makePortCard(h, portPrices[h.t])).join('');
+
+  // Totals
+  let pensionTotal=0, trainingTotal=0;
+  PENSION.forEach(h=>{ if(portPrices[h.t]) pensionTotal += portPrices[h.t].price * h.qty; });
+  TRAINING.forEach(h=>{ if(portPrices[h.t]) trainingTotal += portPrices[h.t].price * h.qty; });
+
+  const pt = document.getElementById('pension-total');
+  const tt = document.getElementById('training-total');
+  
+  const pensionCost = PENSION.reduce((s,h)=>s+h.cost*h.qty,0);
+  const trainingCost = TRAINING.reduce((s,h)=>s+h.cost*h.qty,0);
+  
+  if(pt && pensionTotal>0){
+    const pnl = ((pensionTotal-pensionCost)/pensionCost*100).toFixed(1);
+    const isPos = pensionTotal >= pensionCost;
+    pt.textContent = '$'+pensionTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    pt.style.color = isPos ? 'var(--accent2)' : 'var(--red)';
+    pt.title = `P&L: ${isPos?'+':''}${pnl}%`;
+  }
+  if(tt && trainingTotal>0){
+    const pnl = ((trainingTotal-trainingCost)/trainingCost*100).toFixed(1);
+    const isPos = trainingTotal >= trainingCost;
+    tt.textContent = '$'+trainingTotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    tt.style.color = isPos ? 'var(--accent2)' : 'var(--red)';
+    tt.title = `P&L: ${isPos?'+':''}${pnl}%`;
+  }
+}
+
+async function fetchPortfolio(){
+  const allHoldings = [...PENSION, ...TRAINING];
+  const unique = [...new Set(allHoldings.map(h=>h.t))];
+  
+  const results = await Promise.all(unique.map(t => fetchPrice(t)));
+  unique.forEach((t,i) => { if(results[i]) portPrices[t] = results[i]; });
+  renderPortfolio();
+}
+
+
+// ── Entry Plan ─────────────────────────────────────────────────
+const ENTRY_PLAN = [
+  // ── שלב 1: מחירים אטרקטיביים עכשיו ──
+  {t:'BTC-USD', l:'BTC',   n:'Bitcoin',        entry:65000, max:75000, alloc:14000, pct:35, stage:1,
+   thesis:'מאגר ערך גלובלי — ETF מוסדי + אימוץ מדינות. קנה דרך Kraken → cold wallet בלבד.',
+   action:'העבר $ מאוצר החייל → Kraken → קנה limit order → משוך ל-Ledger',
+   color:'#f7931a', crypto:true},
+
+  {t:'PANW',    l:'PANW',  n:'Palo Alto',       entry:150,   max:168,   alloc:6000,  pct:15, stage:1,
+   thesis:'מנהיגת סייבר AI — כל חברה גדולה משלמת להם. הכנסות חוזרות ועולות.',
+   action:'קנה דרך ברוקר — Interactive Brokers / Kraken (מניה)', 
+   color:'#00d4ff', crypto:false},
+
+  {t:'SMR',     l:'SMR',   n:'NuScale Power',   entry:11,    max:15,    alloc:2800,  pct:7,  stage:1,
+   thesis:'גרעין מודולרי קטן — הפתרון לביקוש החשמל של AI. מחיר נמוך כרגע.',
+   action:'קנה בשלבים — 50% עכשיו, 50% אם ירד עוד',
+   color:'#7bed9f', crypto:false},
+
+  // ── שלב 2: נחושת + אנרגיה ──
+  {t:'FCX',     l:'FCX',   n:'Freeport-McMoRan', entry:58,   max:70,    alloc:6000,  pct:15, stage:2,
+   thesis:'חברת הנחושת הגדולה בעולם. כל כבל חשמל, כל מנוע EV, כל מרכז נתונים — FCX.',
+   action:'המתן לירידה מתחת $65 — אז קנה מיד בשלם',
+   color:'#b87333', crypto:false},
+
+  {t:'COPX',    l:'COPX',  n:'Global Copper ETF', entry:78,  max:90,    alloc:4000,  pct:10, stage:2,
+   thesis:'חשיפה ל-30+ חברות נחושת בו זמנית — מגוון תוך שמירה על התזה.',
+   action:'קנה יחד עם FCX — שניהם שלב 2',
+   color:'#d4956a', crypto:false},
+
+  // ── שלב 3: חשמל + גרעין — המתן לתיקון ──
+  {t:'VRT',     l:'VRT',   n:'Vertiv Holdings',  entry:200,  max:230,   alloc:4000,  pct:10, stage:3,
+   thesis:'קירור מרכזי נתונים — כל שרת AI צריך קירור. VRT הוא ה-bottleneck.',
+   action:'קנה רק אחרי ירידה 15%+ מהשיא — עדיין יקר מדי',
+   color:'#ff4757', crypto:false},
+
+  {t:'CCJ',     l:'CCJ',   n:'Cameco Corp',      entry:98,   max:115,   alloc:3200,  pct:8,  stage:3,
+   thesis:'ספק אורניום #1 לתחנות גרעין — Microsoft+Google חתמו חוזים. ביקוש עולה.',
+   action:'קנה אחרי ירידה לאזור $100 — עדיין מעל יעד',
+   color:'#b44fff', crypto:false},
+
+  {t:'GRID',    l:'GRID',  n:'Grid Infrastructure ETF', entry:140, max:165, alloc:0, pct:0, stage:3,
+   thesis:'תשתיות רשת חשמל — כל השקעה בAI מחייבת שדרוג רשת. ETF רחב.',
+   action:'בונוס אם נשאר תקציב — לא חובה בשלב זה',
+   color:'#00ff9d', crypto:false},
+];
+
+const STAGE_COLORS = {1:'var(--accent2)', 2:'var(--orange)', 3:'var(--red)'};
+
+function renderEntryTable(){
+  const tbody = document.getElementById('entry-tbody');
+  if(!tbody) return;
+
+  let totalNow = 0;
+  let rows = '';
+
+  ENTRY_PLAN.forEach(e => {
+    const p = prices[e.t];
+    const price = p?.price;
+    const chg = parseFloat(p?.change || 0);
+
+    let status, statusColor, statusBg, dist;
+    if(!price){
+      status='טוען...'; statusColor='var(--muted)'; statusBg='transparent'; dist='—';
+    } else {
+      totalNow += price * (e.alloc / price); // units you could buy
+      const distPct = ((price - e.entry) / e.entry * 100);
+      dist = distPct <= 0
+        ? `<span style="color:var(--accent2);font-weight:700">✅ ${Math.abs(distPct).toFixed(1)}% מתחת ליעד</span>`
+        : `<span style="color:var(--muted)">${distPct.toFixed(1)}% מעל יעד</span>`;
+
+      if(price <= e.entry){
+        status='🟢 קנה עכשיו'; statusColor='var(--accent2)'; statusBg='rgba(0,255,157,0.1)';
+      } else if(price <= e.max){
+        status='🟡 קרוב — עקוב'; statusColor='var(--orange)'; statusBg='rgba(255,140,0,0.1)';
+      } else {
+        status='🔴 המתן'; statusColor='var(--red)'; statusBg='rgba(255,71,87,0.08)';
+      }
+    }
+
+    const priceDisplay = price
+      ? `<div style="font-family:var(--mono);font-weight:700">${e.crypto?'$'+Math.round(price).toLocaleString():'$'+price.toFixed(2)}</div>
+         <div style="font-size:10px;color:${chg>=0?'var(--accent2)':'var(--red)'};font-family:var(--mono)">${chg>=0?'+':''}${p?.change||'—'}%</div>`
+      : `<div class="loading-txt" style="font-size:12px">טוען...</div>`;
+
+    const stageColor = STAGE_COLORS[e.stage];
+
+    rows += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);transition:background .2s" 
+      onmouseover="this.style.background='rgba(255,255,255,0.03)'" 
+      onmouseout="this.style.background='transparent'">
+      <td style="padding:13px 12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:3px;height:42px;border-radius:2px;background:${e.color};flex-shrink:0"></div>
+          <div>
+            <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:${e.color}">${e.l}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px">${e.n}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:13px 10px;text-align:center">${priceDisplay}</td>
+      <td style="padding:13px 10px;text-align:center">
+        <div style="font-family:var(--mono);font-weight:700;color:var(--text);font-size:14px">${e.crypto?'$'+e.entry.toLocaleString():'$'+e.entry}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">עד $${e.crypto?e.max.toLocaleString():e.max}</div>
+      </td>
+      <td style="padding:13px 10px;text-align:center;font-size:12px">${dist}</td>
+      <td style="padding:13px 10px;text-align:center">
+        <span style="font-size:13px;font-weight:700;padding:6px 11px;border-radius:7px;
+          background:${statusBg};color:${statusColor};white-space:nowrap">${status}</span>
+      </td>
+      <td style="padding:13px 10px;text-align:center">
+        <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:var(--mono);
+          background:${stageColor}22;color:${stageColor};border:1px solid ${stageColor}44">שלב ${e.stage}</span>
+        ${e.alloc>0?`<div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-top:4px">$${e.alloc.toLocaleString()}</div>`:''}
+      </td>
+      <td style="padding:13px 10px;text-align:right;max-width:200px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:5px">${e.thesis}</div>
+        <div style="font-size:11px;color:var(--accent2);font-weight:600;line-height:1.4">▶ ${e.action||''}</div>
+      </td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows;
+
+  // Update goal progress
+  // Total portfolio rough estimate
+  let pensionVal = 0, trainingVal = 0;
+  PENSION.forEach(h => { if(portPrices[h.t]) pensionVal += portPrices[h.t].price * h.qty; });
+  TRAINING.forEach(h => { if(portPrices[h.t]) trainingVal += portPrices[h.t].price * h.qty; });
+  const liquidEstimate = 40000; // target
+  const totalEst = pensionVal + trainingVal + liquidEstimate;
+  const pct = Math.min(100,(totalEst / 1000000 * 100)).toFixed(1);
+
+  const gtEl = document.getElementById('goal-total-now');
+  const gpEl = document.getElementById('goal-pct-done');
+  const barEl = document.getElementById('goal-progress-bar');
+  const lblEl = document.getElementById('goal-progress-label');
+
+  if(gtEl) gtEl.textContent = '$' + Math.round(totalEst).toLocaleString();
+  if(gpEl) gpEl.textContent = pct + '% מהיעד';
+  if(barEl) setTimeout(()=>{barEl.style.width=pct+'%'},300);
+  if(lblEl) lblEl.textContent = `$${Math.round(totalEst).toLocaleString()} מתוך $1,000,000`;
+}
+
+
+async function fetchMacro(){
+  // Fear & Greed
+  try{
+    const r=await fetch('https://api.alternative.me/fng/?limit=1',{signal:AbortSignal.timeout(6000)});
+    const d=await r.json();
+    const val=parseInt(d?.data?.[0]?.value);
+    if(val>=0){
+      document.getElementById('fg-score').textContent=val;
+      const needle=document.getElementById('fg-needle');
+      if(needle) needle.style.left=val+'%';
+      const badge=document.getElementById('fg-score-badge');
+      let color,meaning,action;
+      if(val<=25){color='#ff4757';meaning='😰 פחד קיצוני';action='✅ זמן לקנות היסטורית';}
+      else if(val<=45){color='#ff8c00';meaning='😟 פחד בשוק';action='⚡ שקול להגדיל';}
+      else if(val<=55){color='#f0c040';meaning='😐 נייטרלי';action='⏳ עקוב ובחכמה';}
+      else if(val<=75){color='#7bed9f';meaning='😏 תאוות בצע';action='⚠️ היזהר מקנייה';}
+      else{color='#00ff9d';meaning='🤑 אופוריה';action='🚫 לא לקנות עכשיו';}
+      if(badge) badge.style.borderColor=color;
+      document.getElementById('fg-score').style.color=color;
+      const m=document.getElementById('fg-meaning');
+      const a=document.getElementById('fg-action');
+      if(m){m.textContent=meaning;m.style.color=color;}
+      if(a) a.textContent=action;
+    }
+  }catch{}
+
+  // Copper futures via stooq (HG=F cents/lb)
+  try{
+    const r=await fetch('https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=json',{signal:AbortSignal.timeout(6000)});
+    const d=await r.json();
+    const q=d?.symbols?.[0];
+    if(q?.close && parseFloat(q.close)>0){
+      const price=parseFloat(q.close);
+      const tonPrice=Math.round(price*2204.62/100);
+      const el=document.getElementById('copper-price');
+      const sig=document.getElementById('copper-signal');
+      if(el) el.textContent='$'+tonPrice.toLocaleString()+'/t';
+      let txt,col;
+      if(tonPrice>10000){txt='🔥 גבוה מאוד — COPX חזק';col='var(--accent2)';}
+      else if(tonPrice>9000){txt='✅ גבוה — תזה פעילה';col='var(--accent2)';}
+      else if(tonPrice>8000){txt='⚡ בינוני — מעקב';col='var(--orange)';}
+      else{txt='⚠️ נמוך — תזה נחלשת';col='var(--red)';}
+      if(sig){sig.textContent=txt;sig.style.color=col;sig.style.borderColor=col;}
+    }
+  }catch{}
+
+  // VIX via stooq
+  try{
+    const r=await fetch('https://stooq.com/q/l/?s=%5Evix&f=sd2t2ohlcv&h&e=json',{signal:AbortSignal.timeout(6000)});
+    const d=await r.json();
+    const q=d?.symbols?.[0];
+    if(q?.close && parseFloat(q.close)>0){
+      const vix=parseFloat(q.close);
+      const el=document.getElementById('vix-price');
+      const sig=document.getElementById('vix-signal');
+      if(el) el.textContent=vix.toFixed(1);
+      let txt,col;
+      if(vix>40){txt='😱 פחד קיצוני — קנה!';col='var(--accent2)';}
+      else if(vix>30){txt='😰 פחד גבוה — הזדמנות';col='var(--accent2)';}
+      else if(vix>20){txt='⚡ מוגבר — עקוב';col='var(--orange)';}
+      else{txt='😌 רגוע — שוק שאנן';col='var(--muted)';}
+      if(sig){sig.textContent=txt;sig.style.color=col;sig.style.borderColor=col;}
+    }
+  }catch{}
+}
+</script>
+</body>
+</html>
